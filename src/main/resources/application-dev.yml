@@ -1,0 +1,9 @@
+# Perfil de desarrollo: apunta al MySQL local levantado con docker-compose.yml.
+# Los defaults aqui solo existen para arrancar rapido en local; nunca se usan en produccion.
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:marketplace_dev}?useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:marketplace}
+    password: ${DB_PASSWORD:marketplace}
+  jpa:
+    show-sql: true

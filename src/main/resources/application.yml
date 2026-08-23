@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: api-compra-venta
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway es la unica fuente de verdad del schema. Hibernate solo valida
+      # que las entidades coincidan con las tablas creadas por las migraciones.
+      # Nunca cambiar a "update" o "create".
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration

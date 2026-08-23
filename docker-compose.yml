@@ -1,0 +1,24 @@
+# MySQL local para desarrollo. NUNCA apunta a RDS de produccion.
+# Uso: copiar .env.example a .env, ajustar valores si hace falta, y correr `docker compose up -d`.
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: api-compra-venta-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-marketplace_dev}
+      MYSQL_USER: ${DB_USERNAME:-marketplace}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-marketplace}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-marketplace}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-marketplace}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mysql_dev_data:

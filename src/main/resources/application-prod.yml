@@ -1,0 +1,10 @@
+# Perfil de produccion: RDS. Sin defaults en host/usuario/password a proposito -
+# si falta configurar una variable de entorno en el EC2, la app debe fallar al
+# arrancar en vez de arrancar con algo inseguro o apuntando al lugar equivocado.
+spring:
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT:3306}/${DB_NAME}?useSSL=true&requireSSL=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    show-sql: false
