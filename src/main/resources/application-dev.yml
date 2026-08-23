@@ -7,3 +7,8 @@ spring:
     password: ${DB_PASSWORD:marketplace}
   jpa:
     show-sql: true
+
+scraper:
+  # Default fuera del repo a proposito, para minimizar riesgo de commit
+  # accidental de la sesion de Facebook aunque ya este en .gitignore.
+  session-file-path: ${SCRAPER_SESSION_FILE:${user.home}/.marketplace-scraper/facebook-session.json}

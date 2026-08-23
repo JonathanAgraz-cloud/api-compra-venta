@@ -8,3 +8,6 @@ spring:
     password: ${DB_PASSWORD}
   jpa:
     show-sql: false
+
+scraper:
+  session-file-path: ${SCRAPER_SESSION_FILE}
