@@ -31,3 +31,9 @@ scraper:
 telegram:
   bot-token: ${TELEGRAM_BOT_TOKEN:}
   chat-id: ${TELEGRAM_CHAT_ID:}
+
+# Apagado por default para que levantar la app en desarrollo no dispare
+# scraping real a Facebook cada hora sin querer. Solo se prende en
+# application-prod.yml (o via SCHEDULER_ENABLED=true si hace falta forzarlo).
+scheduler:
+  enabled: ${SCHEDULER_ENABLED:false}

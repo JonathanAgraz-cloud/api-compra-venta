@@ -11,3 +11,6 @@ spring:
 
 scraper:
   session-file-path: ${SCRAPER_SESSION_FILE}
+
+scheduler:
+  enabled: ${SCHEDULER_ENABLED:true}
