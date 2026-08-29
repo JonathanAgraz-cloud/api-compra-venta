@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: mvn test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      # El wrapper se genero en Windows y en git queda sin el bit ejecutable
+      # (100644) -- sin esto, "Permission denied" en el runner Linux.
+      - name: Dar permisos de ejecucion al Maven Wrapper
+        run: chmod +x mvnw
+
+      # Los runners de GitHub Actions (ubuntu-latest) traen Docker corriendo
+      # por default, asi que Testcontainers (MySQL efimero para los tests de
+      # integracion de repositorios) funciona sin configuracion adicional.
+      - name: Correr mvn test
+        run: ./mvnw --batch-mode --no-transfer-progress test
+
+      - name: Subir reportes de test (si falla)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 7
