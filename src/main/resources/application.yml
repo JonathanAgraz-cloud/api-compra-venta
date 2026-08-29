@@ -24,3 +24,10 @@ scraper:
   delay-max-ms: ${SCRAPER_DELAY_MAX_MS:8000}
   base-location-query: ${SCRAPER_BASE_LOCATION:Mérida, Yucatán, México}
   max-results-per-search: ${SCRAPER_MAX_RESULTS_PER_SEARCH:20}
+
+# Bot de Telegram para el modulo de alertas. Sin default a proposito para
+# bot-token/chat-id (TelegramClient valida en el momento del envio) -- asi
+# arrancar la app en local no exige tener un bot configurado.
+telegram:
+  bot-token: ${TELEGRAM_BOT_TOKEN:}
+  chat-id: ${TELEGRAM_CHAT_ID:}
