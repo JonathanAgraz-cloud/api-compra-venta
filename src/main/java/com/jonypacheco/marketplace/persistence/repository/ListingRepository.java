@@ -15,4 +15,8 @@ public interface ListingRepository extends JpaRepository<Listing, Long> {
     boolean existsByFacebookId(String facebookId);
 
     List<Listing> findByZonaAndEstado(ZonaMerida zona, ListingStatus estado);
+
+    // Usado por el motor de analisis para recorrer todos los listings
+    // candidatos a oportunidad en cada corrida (analyzeAllActiveListings()).
+    List<Listing> findByEstado(ListingStatus estado);
 }
