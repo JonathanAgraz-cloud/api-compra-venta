@@ -2,6 +2,8 @@ package com.jonypacheco.marketplace.scraper.browser;
 
 import com.jonypacheco.marketplace.scraper.ScraperSessionException;
 import com.jonypacheco.marketplace.scraper.config.ScraperProperties;
+import com.jonypacheco.marketplace.scraper.parsing.FacebookUrlResolver;
+import com.jonypacheco.marketplace.scraper.parsing.ListingCardTextParser;
 import com.jonypacheco.marketplace.scraper.parsing.LoginRedirectDetector;
 import com.jonypacheco.marketplace.scraper.parsing.RawListingCard;
 import com.microsoft.playwright.Locator;
@@ -18,16 +20,14 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Navega a una URL de busqueda de Marketplace y extrae tarjetas de
  * resultado crudas. Cero logica de negocio aqui -- solo strings crudos
- * hacia {@link RawListingCard}; el parseo vive en {@code scraper.parsing}.
+ * hacia {@link RawListingCard}; el parseo (texto de tarjeta, URL absoluta)
+ * vive en {@code scraper.parsing} ({@link ListingCardTextParser},
+ * {@link FacebookUrlResolver}).
  *
- * <p><b>Advertencia:</b> los selectores usados aqui (link de item, texto de
- * la tarjeta) son un placeholder razonable, NO verificado contra una sesion
- * real de Facebook -- hay que ajustarlos la primera vez que se corra con
- * Playwright Inspector/{@code codegen} (ver riesgos del modulo scraper). En
- * particular, la heuristica de {@link #dividirTextoDeTarjeta(String)} asume
- * que el texto visible de cada tarjeta viene en lineas separadas
- * aproximadamente en el orden precio/titulo/ubicacion, que es el layout
- * habitual de Marketplace pero puede variar.
+ * <p>Selector y heuristica verificados contra una sesion real autenticada
+ * de Facebook Marketplace (2026-08-29): {@code a[href*='/marketplace/item/']}
+ * encuentra las tarjetas correctamente, y el orden precio/titulo/ubicacion
+ * coincide con el layout real.
  */
 @Component
 public class MarketplaceSearchNavigator {
@@ -89,7 +89,7 @@ public class MarketplaceSearchNavigator {
             }
 
             String innerText = link.innerText();
-            String[] partes = dividirTextoDeTarjeta(innerText);
+            ListingCardTextParser.CardText texto = ListingCardTextParser.parse(innerText);
 
             String imagenUrl = null;
             try {
@@ -99,41 +99,12 @@ public class MarketplaceSearchNavigator {
                 log.debug("No se pudo extraer imagen de una tarjeta de resultado", e);
             }
 
-            return new RawListingCard(href, partes[1], partes[0], partes[2], imagenUrl);
+            return new RawListingCard(FacebookUrlResolver.resolve(href), texto.titulo(), texto.precio(),
+                    texto.ubicacion(), imagenUrl);
         } catch (RuntimeException e) {
             log.warn("No se pudo extraer una tarjeta de resultado, se omite: {}", e.getMessage());
             return null;
         }
-    }
-
-    /**
-     * Heuristica: separa el texto visible de una tarjeta en
-     * {@code [precio, titulo, ubicacion]}. Asume que la primera linea con
-     * pinta de precio (contiene '$' seguido de un digito) es el precio, la
-     * siguiente linea no vacia es el titulo, y la ultima linea restante es
-     * la ubicacion. Placeholder a validar con una tarjeta real.
-     */
-    private String[] dividirTextoDeTarjeta(String innerText) {
-        List<String> lineas = new ArrayList<>();
-        if (innerText != null) {
-            for (String linea : innerText.split("\\R")) {
-                String limpia = linea.trim();
-                if (!limpia.isEmpty()) {
-                    lineas.add(limpia);
-                }
-            }
-        }
-
-        String precio = lineas.stream()
-                .filter(linea -> linea.matches(".*\\$\\s?[0-9].*"))
-                .findFirst()
-                .orElse("");
-        lineas.remove(precio);
-
-        String titulo = lineas.isEmpty() ? "" : lineas.get(0);
-        String ubicacion = lineas.size() > 1 ? lineas.get(lineas.size() - 1) : "";
-
-        return new String[] {precio, titulo, ubicacion};
     }
 
     private void sleepBreve() {

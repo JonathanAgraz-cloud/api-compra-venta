@@ -60,8 +60,11 @@ class ListingIngestServiceTest {
         Listing existente = new Listing("222222222", "iPhone 11 (viejo titulo)", new BigDecimal("5000"),
                 ZonaMerida.OTRA_ZONA, "https://www.facebook.com/marketplace/item/222222222/");
         existente.setEstado(ListingStatus.REMOVED);
+        // URL distinta a la del listing existente a proposito: cubre que
+        // actualizar() refresque tambien la url (bug real encontrado al
+        // ajustar selectores en vivo -- el update no la tocaba).
         RawListingCard raw = new RawListingCard(
-                "https://www.facebook.com/marketplace/item/222222222/",
+                "https://www.facebook.com/marketplace/item/222222222/?ref=search&tracking=nuevo",
                 "iPhone 11 64GB (precio bajado)",
                 "MX$4,500",
                 "Cholul, Yucatan",
@@ -75,6 +78,7 @@ class ListingIngestServiceTest {
         assertThat(existente.getPrecio()).isEqualByComparingTo(new BigDecimal("4500"));
         assertThat(existente.getZona()).isEqualTo(ZonaMerida.CHOLUL);
         assertThat(existente.getEstado()).isEqualTo(ListingStatus.ACTIVE);
+        assertThat(existente.getUrl()).isEqualTo("https://www.facebook.com/marketplace/item/222222222/?ref=search&tracking=nuevo");
     }
 
     @Test

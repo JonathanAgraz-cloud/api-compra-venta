@@ -65,6 +65,7 @@ public class ListingIngestService {
         listing.setPrecio(precio);
         listing.setZona(zona);
         listing.setUbicacionRaw(raw.rawLocationText());
+        listing.setUrl(raw.rawUrl());
         listing.setImagenUrl(raw.rawImageUrl());
         listing.setEstado(ListingStatus.ACTIVE);
         listingRepository.save(listing);
