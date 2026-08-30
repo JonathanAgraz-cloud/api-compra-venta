@@ -1,0 +1,21 @@
+[Unit]
+Description=API Compra-Venta - deteccion de oportunidades de reventa (Facebook Marketplace)
+After=network.target
+
+[Service]
+Type=simple
+User=apicompraventa
+Group=apicompraventa
+WorkingDirectory=/opt/api-compra-venta
+EnvironmentFile=/etc/api-compra-venta.env
+ExecStart=/usr/bin/java -jar /opt/api-compra-venta/target/api-compra-venta-0.1.0-SNAPSHOT.jar
+Restart=on-failure
+RestartSec=10
+
+# El t3.micro tiene ~1GB de RAM real compartido con OpenClaw (Node): se
+# limita la JVM para no arriesgar quedarse sin memoria. Ajustar si el
+# servicio se reinicia por OOM (ver `journalctl -u api-compra-venta`).
+MemoryMax=600M
+
+[Install]
+WantedBy=multi-user.target
