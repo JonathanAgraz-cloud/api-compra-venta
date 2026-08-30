@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oportunidades de reventa</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="page-header">
+        <h1>Oportunidades de reventa</h1>
+        <p class="subtitle">Facebook Marketplace &middot; Mérida, Yucatán</p>
+    </header>
+
+    <main>
+        <div id="resumen" class="resumen" hidden>
+            <div class="resumen-item">
+                <span class="resumen-valor" id="resumen-total">0</span>
+                <span class="resumen-etiqueta">detectadas</span>
+            </div>
+            <div class="resumen-item resumen-item--alta">
+                <span class="resumen-valor" id="resumen-alta">0</span>
+                <span class="resumen-etiqueta">alta ganancia</span>
+            </div>
+        </div>
+
+        <p id="estado-carga" class="estado">Cargando oportunidades…</p>
+        <p id="estado-error" class="estado estado--error" hidden></p>
+        <p id="estado-vacio" class="estado" hidden>
+            Aún no se ha detectado ninguna oportunidad. El scraper corre cada hora entre 08:00 y 23:00 — vuelve más tarde.
+        </p>
+
+        <div id="tabla-wrapper" class="tabla-wrapper" hidden>
+            <table id="tabla-oportunidades">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Anuncio</th>
+                        <th>Zona</th>
+                        <th>Compra</th>
+                        <th>Reventa est.</th>
+                        <th>Ganancia</th>
+                        <th>Clasificación</th>
+                        <th>Detectado</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-cuerpo"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
