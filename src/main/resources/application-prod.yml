@@ -14,3 +14,9 @@ scraper:
 
 scheduler:
   enabled: ${SCHEDULER_ENABLED:true}
+
+# Dashboard (HTTP Basic): sin default a proposito, igual que las demas
+# credenciales -- debe fallar al arrancar si no se configuraron.
+dashboard:
+  username: ${DASHBOARD_USERNAME}
+  password: ${DASHBOARD_PASSWORD}

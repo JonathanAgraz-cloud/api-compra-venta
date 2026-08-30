@@ -12,3 +12,10 @@ scraper:
   # Default fuera del repo a proposito, para minimizar riesgo de commit
   # accidental de la sesion de Facebook aunque ya este en .gitignore.
   session-file-path: ${SCRAPER_SESSION_FILE:${user.home}/.marketplace-scraper/facebook-session.json}
+
+# Dashboard (HTTP Basic): con default solo en dev, para no exigir configurar
+# credenciales al levantar la app localmente. Nunca tiene default en produccion
+# (ver application-prod.yml).
+dashboard:
+  username: ${DASHBOARD_USERNAME:dev}
+  password: ${DASHBOARD_PASSWORD:dev}
