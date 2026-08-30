@@ -56,7 +56,7 @@ public class Listing {
     @Column(nullable = false, length = 500)
     private String url;
 
-    @Column(name = "imagen_url", length = 500)
+    @Column(name = "imagen_url", columnDefinition = "TEXT")
     private String imagenUrl;
 
     @Enumerated(EnumType.STRING)
