@@ -1,5 +1,6 @@
 package com.jonypacheco.marketplace.alert.message;
 
+import com.jonypacheco.marketplace.alert.AlertBatchSummary;
 import com.jonypacheco.marketplace.analysis.AnalysisOutcome;
 import com.jonypacheco.marketplace.analysis.OpportunityResult;
 import com.jonypacheco.marketplace.analysis.pricing.ProfitCalculation;
@@ -48,6 +49,24 @@ public final class AlertMessageFormatter {
                 + "Comparables usados: " + resultado.comparablesUsados() + "\n"
                 + "\n"
                 + listing.getUrl();
+    }
+
+    /**
+     * Mensaje de "corrida completa, sin alertas nuevas" -- a peticion de Jony,
+     * para saber que el scraper sigue vivo y corriendo aunque esa hora no haya
+     * encontrado nada que valga la pena (ver AlertService#processOpportunities).
+     */
+    public static String formatSinOportunidadesNuevas(AlertBatchSummary resumen) {
+        StringBuilder texto = new StringBuilder("🔍 Corrida completa, sin alertas nuevas\n\n");
+        texto.append("Anuncios revisados sin oportunidad: ").append(resumen.noOportunidades()).append("\n");
+        if (resumen.yaAlertadas() > 0) {
+            texto.append("Oportunidades que ya se habian notificado antes: ").append(resumen.yaAlertadas()).append("\n");
+        }
+        if (resumen.fallidas() > 0) {
+            texto.append("Fallos de envio (se reintentan solos la siguiente hora): ").append(resumen.fallidas()).append("\n");
+        }
+        texto.append("\nSeguimos revisando cada hora.");
+        return texto.toString();
     }
 
     private static String monto(BigDecimal valor) {

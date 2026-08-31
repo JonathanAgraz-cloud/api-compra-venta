@@ -1,5 +1,6 @@
 package com.jonypacheco.marketplace.alert.message;
 
+import com.jonypacheco.marketplace.alert.AlertBatchSummary;
 import com.jonypacheco.marketplace.analysis.AnalysisOutcome;
 import com.jonypacheco.marketplace.analysis.OpportunityResult;
 import com.jonypacheco.marketplace.analysis.pricing.ProfitCalculation;
@@ -63,5 +64,27 @@ class AlertMessageFormatterTest {
 
         assertThatThrownBy(() -> AlertMessageFormatter.format(descartado))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void mensajeSinOportunidadesIncluyeElConteoDeNoOportunidades() {
+        AlertBatchSummary resumen = new AlertBatchSummary(0, 0, 0, 41);
+
+        String mensaje = AlertMessageFormatter.formatSinOportunidadesNuevas(resumen);
+
+        assertThat(mensaje).contains("sin alertas nuevas");
+        assertThat(mensaje).contains("Anuncios revisados sin oportunidad: 41");
+        assertThat(mensaje).doesNotContain("ya se habian notificado");
+        assertThat(mensaje).doesNotContain("Fallos de envio");
+    }
+
+    @Test
+    void mensajeSinOportunidadesMencionaYaAlertadasYFallidasCuandoExisten() {
+        AlertBatchSummary resumen = new AlertBatchSummary(0, 2, 1, 10);
+
+        String mensaje = AlertMessageFormatter.formatSinOportunidadesNuevas(resumen);
+
+        assertThat(mensaje).contains("ya se habian notificado antes: 2");
+        assertThat(mensaje).contains("Fallos de envio (se reintentan solos la siguiente hora): 1");
     }
 }

@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -150,5 +151,45 @@ class AlertServiceTest {
         assertThat(resumen.yaAlertadas()).isEqualTo(1);
         assertThat(resumen.fallidas()).isEqualTo(1);
         assertThat(resumen.noOportunidades()).isEqualTo(1);
+    }
+
+    @Test
+    void mandaAvisoDeSinAlertasNuevasCuandoNingunaOportunidadSeAlerto() {
+        alertService = new AlertService(alertSentRepository, telegramClient);
+        Listing listing = listingDeEjemplo();
+        when(telegramClient.sendMessage(anyString())).thenReturn(true);
+
+        List<OpportunityResult> resultados = List.of(
+                OpportunityResult.descartado(listing, AnalysisOutcome.PROFIT_TOO_LOW, 5));
+
+        AlertBatchSummary resumen = alertService.processOpportunities(resultados);
+
+        assertThat(resumen.enviadas()).isZero();
+        verify(telegramClient, times(1)).sendMessage(anyString());
+    }
+
+    @Test
+    void noMandaAvisoDeSinAlertasNuevasSiSeEnvioAlMenosUnaOportunidad() {
+        alertService = new AlertService(alertSentRepository, telegramClient);
+        Listing listing = listingDeEjemplo();
+        when(alertSentRepository.existsByListing_Id(10L)).thenReturn(false);
+        when(telegramClient.sendMessage(anyString())).thenReturn(true);
+
+        AlertBatchSummary resumen = alertService.processOpportunities(List.of(oportunidadEncontrada(listing)));
+
+        assertThat(resumen.enviadas()).isEqualTo(1);
+        verify(telegramClient, times(1)).sendMessage(anyString());
+    }
+
+    @Test
+    void noFallaSiElAvisoDeSinAlertasNuevasNoSePudoEnviar() {
+        alertService = new AlertService(alertSentRepository, telegramClient);
+        Listing listing = listingDeEjemplo();
+        when(telegramClient.sendMessage(anyString())).thenReturn(false);
+
+        AlertBatchSummary resumen = alertService.processOpportunities(
+                List.of(OpportunityResult.descartado(listing, AnalysisOutcome.PROFIT_TOO_LOW, 5)));
+
+        assertThat(resumen.enviadas()).isZero();
     }
 }

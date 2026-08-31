@@ -47,7 +47,26 @@ public class AlertService {
             resumen = resumen.sumar(sendAlert(resultado));
         }
         log.info("Procesamiento de alertas completo: {}", resumen);
+
+        if (resumen.enviadas() == 0) {
+            notifySinOportunidadesNuevas(resumen);
+        }
         return resumen;
+    }
+
+    /**
+     * Aviso de "corrida completa, sin nada nuevo" pedido por Jony para estar
+     * pendiente de que el scraper sigue corriendo aunque esa hora no haya
+     * encontrado ninguna oportunidad nueva que alertar. No es critico: si
+     * falla el envio, solo se loggea (no bloquea ni reintenta, a diferencia
+     * de una alerta real de oportunidad).
+     */
+    private void notifySinOportunidadesNuevas(AlertBatchSummary resumen) {
+        String mensaje = AlertMessageFormatter.formatSinOportunidadesNuevas(resumen);
+        boolean enviado = telegramClient.sendMessage(mensaje);
+        if (!enviado) {
+            log.warn("No se pudo enviar el aviso de 'sin alertas nuevas' a Telegram (no es critico, se omite)");
+        }
     }
 
     public AlertOutcome sendAlert(OpportunityResult resultado) {
